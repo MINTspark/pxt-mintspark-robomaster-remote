@@ -1,4 +1,6 @@
 let radioGroup = 123;
+let message = "";
+let messageComplete = false;
 radio.setGroup(radioGroup);
 
 input.onButtonPressed(Button.A, function() {
@@ -30,3 +32,16 @@ function sendString(message:string)
 
     radio.sendString("end");
 }
+
+radio.onReceivedString(function (receivedString: string) {
+        if (receivedString == "start") {
+            messageComplete = false;
+            message = "";
+        }
+        else if (receivedString == "end") {
+            messageComplete = true;
+        }
+        else {
+            message += receivedString;
+        }
+})
