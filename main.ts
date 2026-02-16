@@ -36,6 +36,7 @@ input.onButtonPressed(Button.B, function () {
 
 function moveArmX (out:boolean)
 {
+
     if (armIsMoving)
     {
         return;
@@ -43,26 +44,37 @@ function moveArmX (out:boolean)
 
     armIsMoving = true;
     let increment = 5;
-    updateArmPosition();
-    let newPosition = out ? armX + increment : armX - increment;
-
-    if (newPosition > armXMax)
+    if (updateArmPosition())
     {
-        newPosition = armXMax;
-    }
-    else (newPosition < armXMin)
-    {
-        newPosition = armXMin;
-    }
+        let newPosition = out ? armX + increment : armX - increment;
 
-    sendString("robotic_arm moveto x " + newPosition + " y "+ armY +";");
-    basic.pause(50);
-    armIsMoving = false;
+        if (newPosition > armXMax)
+        {
+            newPosition = armXMax;
+        }
+        else (newPosition < armXMin)
+        {
+            newPosition = armXMin;
+        }
+
+        sendString("robotic_arm moveto x " + newPosition + " y "+ armY +";");
+        basic.pause(50);
+        armIsMoving = false;
+    }
+    else
+    {
+        music.play(music.tonePlayable(Note.C, music.beat(BeatFraction.Eighth)), music.PlaybackMode.UntilDone)
+    }
 }
 
 function updateArmPosition() : boolean
 {
     let response = getCommandResponse("robotic_arm position ?;");
+    if (response == "")
+    {
+        return false;
+    }
+
     response = response.substr(0, response.length - 1)
     let parts = response.split(" ");
 
@@ -70,9 +82,11 @@ function updateArmPosition() : boolean
     {
         armX = parseInt(parts[0]);
         armY = parseInt(parts[1]);
+        basic.showNumber(armX)
+        basic.showNumber(armY)
         return true;
     }
-
+    basic.showString("X")
     return false;
 }
 
@@ -81,13 +95,13 @@ function getCommandResponse(command:string) : string
     let response = "";
     messageComplete = false;
     let start = input.runningTime();
+    sendString(command);
 
     do
     {
-        basic.pause(100);
-        
+        basic.pause(100);        
     } 
-    while (!messageComplete || (input.runningTime() - start) < 5000)
+    while (!messageComplete && (input.runningTime() - start) < 5000)
     return message;
 }
 
