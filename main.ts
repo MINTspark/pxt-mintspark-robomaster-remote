@@ -75,8 +75,10 @@ function updateArmPosition() : boolean
         return false;
     }
 
+
+    response = response.trim();
     response = response.substr(0, response.length - 1)
-    let parts = response.split(" ");
+    let parts = response.trim().split(" ");
 
     if (parts.length == 2)
     {
@@ -86,7 +88,11 @@ function updateArmPosition() : boolean
         basic.showNumber(armY)
         return true;
     }
-    basic.showString("X")
+    basic.showString(parts[0])
+    basic.showIcon(IconNames.Heart)
+    basic.showString(parts[1])
+    basic.showIcon(IconNames.Heart)
+    //basic.showString(parts[2])
     return false;
 }
 
@@ -101,7 +107,7 @@ function getCommandResponse(command:string) : string
     {
         basic.pause(100);        
     } 
-    while (!messageComplete && (input.runningTime() - start) < 5000)
+    while (!messageComplete && (input.runningTime() - start) < 10000)
     return message;
 }
 
