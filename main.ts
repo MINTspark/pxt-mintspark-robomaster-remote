@@ -52,12 +52,14 @@ function moveArmX (out:boolean)
         {
             newPosition = armXMax;
         }
-        else (newPosition < armXMin)
+        else if (newPosition < armXMin)
         {
             newPosition = armXMin;
         }
+ 
+        let newString = "robotic_arm moveto x " + newPosition + " y " + armY + ";"
 
-        sendString("robotic_arm moveto x " + newPosition + " y "+ armY +";");
+        sendString(newString);
         basic.pause(50);
         armIsMoving = false;
     }
@@ -84,15 +86,8 @@ function updateArmPosition() : boolean
     {
         armX = parseInt(parts[0]);
         armY = parseInt(parts[1]);
-        basic.showNumber(armX)
-        basic.showNumber(armY)
         return true;
     }
-    basic.showString(parts[0])
-    basic.showIcon(IconNames.Heart)
-    basic.showString(parts[1])
-    basic.showIcon(IconNames.Heart)
-    //basic.showString(parts[2])
     return false;
 }
 
