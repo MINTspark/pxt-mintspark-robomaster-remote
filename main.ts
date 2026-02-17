@@ -9,94 +9,101 @@ let armYMax = 100;
 let armYMin = -10;
 let armY = 0;
 let armGrip = 0;
+let armReady = false;
 radio.setGroup(radioGroup);
 
-
+basic.forever(function() {
+    if (input.buttonIsPressed(Button.A))
+    {
+        moveArmX(false);
+    }
+    else if (input.buttonIsPressed(Button.B)){
+        moveArmX(true);
+    }
+    else if (input.pinIsPressed(TouchPin.P0)) {
+        moveArmY(false);
+    }
+    else if (input.pinIsPressed(TouchPin.P2)) {
+        moveArmY(true);
+    }
+    basic.pause(100)
+})
 
 input.onButtonPressed(Button.A, function() {
     //sendString("chassis speed x 0 y 0 z 20;");
     // sendString("robotic_arm moveto x 190 y -10;");
     //sendString("servo speed id 5 speed 20;");
-    moveArmX(false);
+    //moveArmX(false);
 })
 
 input.onButtonPressed(Button.B, function () {
     //sendString("chassis speed x 0 y 0 z 0;");
     //sendString("robotic_arm moveto x 90 y 0;");
     //sendString("servo speed id 5 speed 0;");
-    moveArmX(true);
+    //moveArmX(true);
 })
-input.logoIsPressed()
-{
-    moveArmY(true)
-}
+
 input.onButtonPressed(Button.AB, function () {
-    moveArmY(false);
+    sendString("robotic_arm recenter;");
+    if (updateArmPosition()) {
+        armReady = true;
+        basic.showIcon(IconNames.Happy)
+    }
 })
+
 
 function moveArmX (out:boolean)
 {
-
-    if (armIsMoving)
+    if (armIsMoving || (armX >= armXMax && out) || (armX <= armXMin && !out))
     {
         return;
     }
 
     armIsMoving = true;
-    let increment = 15;
-    if (updateArmPosition())
-    {
-        let newPosition = out ? armX + increment : armX - increment;
+    let increment = 50;
+    let newPosition = out ? armX + increment : armX - increment;
 
-        if (newPosition > armXMax)
-        {
-            newPosition = armXMax;
-        }
-        else if (newPosition < armXMin)
-        {
-            newPosition = armXMin;
-        }
- 
-        let newString = "robotic_arm moveto x " + newPosition + " y " + armY + ";"
-
-        sendString(newString);
-        basic.pause(50);
-        armIsMoving = false;
-    }
-    else
+    if (newPosition > armXMax)
     {
-        music.play(music.tonePlayable(Note.C, music.beat(BeatFraction.Eighth)), music.PlaybackMode.UntilDone)
+        newPosition = armXMax;
     }
+    else if (newPosition < armXMin)
+    {
+        newPosition = armXMin;
+    }
+
+    let newString = "robotic_arm moveto x " + newPosition + " y " + armY + ";"
+
+    sendString(newString);
+    basic.pause(500);
+    armX = newPosition;
+    armIsMoving = false;
 }
 
 function moveArmY(up: boolean) {
-
-    //if (armIsMoving) {
-        //return;
-    //}
+    if (armIsMoving || (armY >= armYMax && up) || (armY <= armYMin && !up)) {
+        return;
+    }
 
     armIsMoving = true;
-    let increment = 15;
-    if (updateArmPosition()) {
-        let newPosition = up ? armY + increment : armY - increment;
+    let increment = 50;
+    let newPosition = up ? armY + increment : armY - increment;
 
-        if (newPosition > armYMax) {
-            newPosition = armYMax;
-        }
-        else if (newPosition < armYMin) {
-            newPosition = armYMin;
-        }
-        basic.showNumber(newPosition)
-        let newString = "robotic_arm moveto x " + armX + " y " + newPosition + ";"
+    if (newPosition > armYMax) {
+        newPosition = armYMax;
+    }
+    else if (newPosition < armYMin) {
+        newPosition = armYMin;
+    }
 
-        sendString(newString);
-        basic.pause(50);
-        armIsMoving = false;
-    }
-    else {
-        music.play(music.tonePlayable(Note.C, music.beat(BeatFraction.Eighth)), music.PlaybackMode.UntilDone)
-    }
+    let newString = "robotic_arm moveto x " + armX + " y " + newPosition + ";"
+
+    sendString(newString);
+    basic.pause(500);
+    armY = newPosition;
+    armIsMoving = false;
 }
+
 
 function updateArmPosition() : boolean
 {
