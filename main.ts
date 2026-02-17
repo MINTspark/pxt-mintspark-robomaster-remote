@@ -5,33 +5,33 @@ let armIsMoving = false;
 let armX = 0;
 let armXMax = 190;
 let armXMin = 90;
-let armYMax = -10;
-let armYMin = 100;
+let armYMax = 100;
+let armYMin = -10;
 let armY = 0;
 let armGrip = 0;
 radio.setGroup(radioGroup);
 
-basic.forever(function() {
-    if (input.buttonIsPressed(Button.A))
-    {
-        moveArmX(false);
-    }
 
-    if (input.buttonIsPressed(Button.B)) {
-        moveArmX(true);
-    }
-
-    basic.pause(100);
-})
 
 input.onButtonPressed(Button.A, function() {
     //sendString("chassis speed x 0 y 0 z 20;");
     // sendString("robotic_arm moveto x 190 y -10;");
+    //sendString("servo speed id 5 speed 20;");
+    moveArmX(false);
 })
 
 input.onButtonPressed(Button.B, function () {
     //sendString("chassis speed x 0 y 0 z 0;");
     //sendString("robotic_arm moveto x 90 y 0;");
+    //sendString("servo speed id 5 speed 0;");
+    moveArmX(true);
+})
+input.logoIsPressed()
+{
+    moveArmY(true)
+}
+input.onButtonPressed(Button.AB, function () {
+    moveArmY(false);
 })
 
 function moveArmX (out:boolean)
@@ -43,7 +43,7 @@ function moveArmX (out:boolean)
     }
 
     armIsMoving = true;
-    let increment = 5;
+    let increment = 15;
     if (updateArmPosition())
     {
         let newPosition = out ? armX + increment : armX - increment;
@@ -65,6 +65,35 @@ function moveArmX (out:boolean)
     }
     else
     {
+        music.play(music.tonePlayable(Note.C, music.beat(BeatFraction.Eighth)), music.PlaybackMode.UntilDone)
+    }
+}
+
+function moveArmY(up: boolean) {
+
+    //if (armIsMoving) {
+        //return;
+    //}
+
+    armIsMoving = true;
+    let increment = 15;
+    if (updateArmPosition()) {
+        let newPosition = up ? armY + increment : armY - increment;
+
+        if (newPosition > armYMax) {
+            newPosition = armYMax;
+        }
+        else if (newPosition < armYMin) {
+            newPosition = armYMin;
+        }
+        basic.showNumber(newPosition)
+        let newString = "robotic_arm moveto x " + armX + " y " + newPosition + ";"
+
+        sendString(newString);
+        basic.pause(50);
+        armIsMoving = false;
+    }
+    else {
         music.play(music.tonePlayable(Note.C, music.beat(BeatFraction.Eighth)), music.PlaybackMode.UntilDone)
     }
 }
