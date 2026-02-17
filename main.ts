@@ -56,6 +56,7 @@ function moveArmX (out:boolean)
 {
     if (armIsMoving || (armX >= armXMax && out) || (armX <= armXMin && !out))
     {
+        music.play(music.tonePlayable(Note.C, music.beat(BeatFraction.Whole)), music.PlaybackMode.UntilDone)
         return;
     }
 
@@ -82,6 +83,7 @@ function moveArmX (out:boolean)
 
 function moveArmY(up: boolean) {
     if (armIsMoving || (armY >= armYMax && up) || (armY <= armYMin && !up)) {
+        music.play(music.tonePlayable(Note.C, music.beat(BeatFraction.Whole)), music.PlaybackMode.UntilDone)
         return;
     }
 
